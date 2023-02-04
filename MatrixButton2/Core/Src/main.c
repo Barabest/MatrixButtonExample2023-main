@@ -69,6 +69,8 @@ PortPin L[4] =
 
 //For Button Contenter
 uint16_t ButtonMatrix=0;
+uint16_t Check=0;
+uint16_t Count=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -130,9 +132,16 @@ int main(void)
 	  if(HAL_GetTick()>=timestamp)
 	  {
 		  timestamp =HAL_GetTick() + 10;
-		  ReadMatrixButton_1Row();
-
+		  ReadMatrixButton_1Row(); //สั่งให้ฟังก์ชันทำงาน
+		  if(ButtonMatrix != Check && ButtonMatrix != 0){
+			  Check=ButtonMatrix;
+			  Count++;
+		  }
+		  if (ButtonMatrix==0){
+			  Check = 0;
+		  }
 	  }
+
   }
   /* USER CODE END 3 */
 }
