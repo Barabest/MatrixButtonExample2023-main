@@ -72,7 +72,6 @@ uint16_t ButtonMatrix=0;
 uint16_t Check=0;
 uint16_t Count=0;
 uint16_t number[11] = {0};
-uint16_t password[11] = {6,4,3,4,0,5,0,0,0,3,7};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -82,7 +81,6 @@ static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 void ReadMatrixButton_1Row();
 uint16_t Numpad(uint16_t numbercheck);
-int arrays_equal(int a[], int b[]);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -141,6 +139,7 @@ int main(void)
 			  if(ButtonMatrix == 4096) // ปุ่ม clear
 			  {
 				  int i;
+				  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 				  Count = 0;
 					for (i=0;i<11;i++){
 						number[i]=0;
@@ -148,7 +147,8 @@ int main(void)
 			  }
 			  if(ButtonMatrix == 32768) // ปุ่ม ok
 			  {
-				  if(arrays_equal(password,number)){
+				  if(number[0] == 6 && number[1] == 4 && number[2] == 3 && number[3] == 4 && number[4] == 0 && number[5] == 5 && number[6] == 0 && number[7] == 0 && number[8] == 0 && number[9] == 3 && number[10] == 7)
+				  {
 					  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
 				  }
 			  }
@@ -156,6 +156,7 @@ int main(void)
 				  Check=ButtonMatrix;
 				  number[Count]=Numpad(ButtonMatrix);
 				  Count++;
+				  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 			  }
 			  if (ButtonMatrix==0){
 				  Check = 0;
@@ -317,14 +318,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-int arrays_equal(int a[], int b[]) {
-  for (int i = 0; i < 11; i++) {
-    if (a[i] != b[i]) {
-      return 0;
-    }
-  }
-  return 1;
-}
 uint16_t Numpad(uint16_t numbercheck)
 {
 	uint16_t numbernumpad = 0;
