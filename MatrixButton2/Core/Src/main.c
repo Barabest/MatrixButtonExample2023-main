@@ -71,6 +71,8 @@ PortPin L[4] =
 uint16_t ButtonMatrix=0;
 uint16_t Check=0;
 uint16_t Count=0;
+uint16_t number[11] = {0};
+uint16_t password[11] = {6,4,3,4,0,5,0,0,0,3,7};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -79,6 +81,8 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 void ReadMatrixButton_1Row();
+uint16_t Numpad(uint16_t numbercheck);
+int arrays_equal(int a[], int b[]);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -133,15 +137,31 @@ int main(void)
 	  {
 		  timestamp =HAL_GetTick() + 10;
 		  ReadMatrixButton_1Row(); //สั่งให้ฟังก์ชันทำงาน
-		  if(ButtonMatrix != Check && ButtonMatrix != 0){
-			  Check=ButtonMatrix;
-			  Count++;
+		  if(ButtonMatrix != 128 && ButtonMatrix != 2048 & ButtonMatrix != 16384 & ButtonMatrix != 8192){
+			  if(ButtonMatrix == 4096) // ปุ่ม clear
+			  {
+				  int i;
+				  Count = 0;
+					for (i=0;i<11;i++){
+						number[i]=0;
+					}
+			  }
+			  if(ButtonMatrix == 32768) // ปุ่ม ok
+			  {
+				  if(arrays_equal(password,number)){
+					  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+				  }
+			  }
+			  if(ButtonMatrix != Check && ButtonMatrix != 0 && Count < 11){
+				  Check=ButtonMatrix;
+				  number[Count]=Numpad(ButtonMatrix);
+				  Count++;
+			  }
+			  if (ButtonMatrix==0){
+				  Check = 0;
+				  }
+			  }
 		  }
-		  if (ButtonMatrix==0){
-			  Check = 0;
-		  }
-	  }
-
   }
   /* USER CODE END 3 */
 }
@@ -297,6 +317,63 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+int arrays_equal(int a[], int b[]) {
+  for (int i = 0; i < 11; i++) {
+    if (a[i] != b[i]) {
+      return 0;
+    }
+  }
+  return 1;
+}
+uint16_t Numpad(uint16_t numbercheck)
+{
+	uint16_t numbernumpad = 0;
+	register int i;
+switch (numbercheck)
+{
+	case 1:
+		numbernumpad = 7;
+		break;
+
+	case 2:
+			numbernumpad = 4;
+			break;
+
+	case 4:
+			numbernumpad = 1;
+			break;
+
+	case 8:
+			numbernumpad = 0;
+			break;
+
+	case 16:
+			numbernumpad = 8;
+			break;
+
+	case 32:
+			numbernumpad = 5;
+			break;
+
+	case 64:
+			numbernumpad = 2;
+			break;
+
+	case 256:
+			numbernumpad = 9;
+			break;
+
+	case 512:
+			numbernumpad = 6;
+			break;
+
+	case 1024:
+			numbernumpad = 3;
+			break;
+	return numbernumpad;
+}
+
+}
 void ReadMatrixButton_1Row()
 {
 	//
